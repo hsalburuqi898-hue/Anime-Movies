@@ -1,12 +1,10 @@
-
-
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class ProductView extends StatefulWidget {
   final Map<String, dynamic> product;
 
-  const ProductView({Key? key, required this.product}) : super(key: key);
+  const ProductView({super.key, required this.product});
 
   @override
   State<ProductView> createState() => _ProductViewState();
@@ -25,20 +23,19 @@ class _ProductViewState extends State<ProductView>
       duration: const Duration(milliseconds: 800),
       vsync: this,
     );
-    _fadeAnimation = Tween<double>(
-      begin: 0.0,
-      end: 1.0,
-    ).animate(CurvedAnimation(
-      parent: _animationController,
-      curve: const Interval(0.0, 0.6, curve: Curves.easeOut),
-    ));
-    _slideAnimation = Tween<Offset>(
-      begin: const Offset(0, 0.3),
-      end: Offset.zero,
-    ).animate(CurvedAnimation(
-      parent: _animationController,
-      curve: const Interval(0.3, 1.0, curve: Curves.easeOut),
-    ));
+    _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(
+        parent: _animationController,
+        curve: const Interval(0.0, 0.6, curve: Curves.easeOut),
+      ),
+    );
+    _slideAnimation =
+        Tween<Offset>(begin: const Offset(0, 0.3), end: Offset.zero).animate(
+          CurvedAnimation(
+            parent: _animationController,
+            curve: const Interval(0.3, 1.0, curve: Curves.easeOut),
+          ),
+        );
     _animationController.forward();
   }
 
@@ -108,10 +105,7 @@ class _ProductViewState extends State<ProductView>
                   if (imageUrl != null)
                     Hero(
                       tag: 'movie-${widget.product['mal_id']}',
-                      child: Image.network(
-                        imageUrl,
-                        fit: BoxFit.cover,
-                      ),
+                      child: Image.network(imageUrl, fit: BoxFit.cover),
                     ),
                   // Gradient overlay
                   Container(
@@ -132,7 +126,9 @@ class _ProductViewState extends State<ProductView>
             leading: Container(
               margin: const EdgeInsets.all(8),
               decoration: BoxDecoration(
-                color: Theme.of(context).scaffoldBackgroundColor.withOpacity(0.9),
+                color: Theme.of(
+                  context,
+                ).scaffoldBackgroundColor.withOpacity(0.9),
                 shape: BoxShape.circle,
               ),
               child: IconButton(
@@ -144,7 +140,9 @@ class _ProductViewState extends State<ProductView>
               Container(
                 margin: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
-                  color: Theme.of(context).scaffoldBackgroundColor.withOpacity(0.9),
+                  color: Theme.of(
+                    context,
+                  ).scaffoldBackgroundColor.withOpacity(0.9),
                   shape: BoxShape.circle,
                 ),
                 child: IconButton(
@@ -157,7 +155,9 @@ class _ProductViewState extends State<ProductView>
               Container(
                 margin: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
-                  color: Theme.of(context).scaffoldBackgroundColor.withOpacity(0.9),
+                  color: Theme.of(
+                    context,
+                  ).scaffoldBackgroundColor.withOpacity(0.9),
                   shape: BoxShape.circle,
                 ),
                 child: IconButton(
@@ -194,13 +194,14 @@ class _ProductViewState extends State<ProductView>
                         // Title with animation
                         Text(
                           title,
-                          style: Theme.of(context).textTheme.displaySmall?.copyWith(
+                          style: Theme.of(context).textTheme.displaySmall
+                              ?.copyWith(
                                 fontWeight: FontWeight.bold,
                                 height: 1.2,
                               ),
                         ),
                         const SizedBox(height: 16),
-                        
+
                         // Score and status row
                         Row(
                           children: [
@@ -255,7 +256,7 @@ class _ProductViewState extends State<ProductView>
                           ],
                         ),
                         const SizedBox(height: 20),
-                        
+
                         // Info chips with modern design
                         Wrap(
                           spacing: 12,
@@ -294,21 +295,19 @@ class _ProductViewState extends State<ProductView>
                           ],
                         ),
                         const SizedBox(height: 32),
-                        
+
                         // Synopsis section with modern design
                         Container(
                           padding: const EdgeInsets.all(20),
                           decoration: BoxDecoration(
-                            color: Theme.of(context)
-                                .colorScheme
-                                .surface
-                                .withOpacity(0.5),
+                            color: Theme.of(
+                              context,
+                            ).colorScheme.surface.withOpacity(0.5),
                             borderRadius: BorderRadius.circular(16),
                             border: Border.all(
-                              color: Theme.of(context)
-                                  .colorScheme
-                                  .outline
-                                  .withOpacity(0.1),
+                              color: Theme.of(
+                                context,
+                              ).colorScheme.outline.withOpacity(0.1),
                             ),
                           ),
                           child: Column(
@@ -318,7 +317,9 @@ class _ProductViewState extends State<ProductView>
                                 children: [
                                   Icon(
                                     Icons.description_rounded,
-                                    color: Theme.of(context).colorScheme.primary,
+                                    color: Theme.of(
+                                      context,
+                                    ).colorScheme.primary,
                                   ),
                                   const SizedBox(width: 8),
                                   Text(
@@ -326,28 +327,26 @@ class _ProductViewState extends State<ProductView>
                                     style: Theme.of(context)
                                         .textTheme
                                         .titleLarge
-                                        ?.copyWith(
-                                          fontWeight: FontWeight.bold,
-                                        ),
+                                        ?.copyWith(fontWeight: FontWeight.bold),
                                   ),
                                 ],
                               ),
                               const SizedBox(height: 12),
                               Text(
                                 synopsis,
-                                style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                                style: Theme.of(context).textTheme.bodyLarge
+                                    ?.copyWith(
                                       height: 1.6,
-                                      color: Theme.of(context)
-                                          .colorScheme
-                                          .onSurface
-                                          .withOpacity(0.8),
+                                      color: Theme.of(
+                                        context,
+                                      ).colorScheme.onSurface.withOpacity(0.8),
                                     ),
                               ),
                             ],
                           ),
                         ),
                         const SizedBox(height: 32),
-                        
+
                         // Action buttons
                         if (malUrl.isNotEmpty) ...[
                           SizedBox(
@@ -364,7 +363,9 @@ class _ProductViewState extends State<ProductView>
                                 ),
                               ),
                               style: ElevatedButton.styleFrom(
-                                backgroundColor: Theme.of(context).colorScheme.primary,
+                                backgroundColor: Theme.of(
+                                  context,
+                                ).colorScheme.primary,
                                 foregroundColor: Colors.white,
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(16),
@@ -441,11 +442,7 @@ class _ProductViewState extends State<ProductView>
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(
-            icon,
-            size: 18,
-            color: Theme.of(context).colorScheme.primary,
-          ),
+          Icon(icon, size: 18, color: Theme.of(context).colorScheme.primary),
           const SizedBox(width: 8),
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -453,17 +450,16 @@ class _ProductViewState extends State<ProductView>
               Text(
                 label,
                 style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                      color: Theme.of(context)
-                          .colorScheme
-                          .onSurface
-                          .withOpacity(0.6),
-                    ),
+                  color: Theme.of(
+                    context,
+                  ).colorScheme.onSurface.withOpacity(0.6),
+                ),
               ),
               Text(
                 value,
-                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      fontWeight: FontWeight.w600,
-                    ),
+                style: Theme.of(
+                  context,
+                ).textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w600),
               ),
             ],
           ),

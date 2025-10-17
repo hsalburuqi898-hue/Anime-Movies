@@ -1,11 +1,12 @@
-
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 import 'product_view.dart';
+import '../auth/login_screen.dart';
 
 class ProductsView extends StatefulWidget {
-  const ProductsView({Key? key}) : super(key: key);
+  const ProductsView({super.key});
 
   @override
   State<ProductsView> createState() => _ProductsViewState();
@@ -17,6 +18,8 @@ class _ProductsViewState extends State<ProductsView>
   late AnimationController _animationController;
   String _selectedFilter = 'All';
   final List<String> _filters = ['All', 'Top Rated', 'Recent', 'Classic'];
+  String _userName = 'User';
+  String _userEmail = '';
 
   @override
   void initState() {
@@ -27,6 +30,28 @@ class _ProductsViewState extends State<ProductsView>
       vsync: this,
     );
     _animationController.forward();
+    _loadUserData();
+  }
+
+  Future<void> _loadUserData() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      _userName = prefs.getString('username') ?? 'User';
+      _userEmail = prefs.getString('email') ?? 'user@example.com';
+    });
+  }
+
+  Future<void> _logout() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.clear();
+
+    if (mounted) {
+      Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(builder: (context) => const LoginScreen()),
+        (route) => false,
+      );
+    }
   }
 
   @override
@@ -59,12 +84,22 @@ class _ProductsViewState extends State<ProductsView>
       appBar: AppBar(
         title: Text(
           "Anime Movies",
-          style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                fontWeight: FontWeight.bold,
-              ),
+          style: Theme.of(
+            context,
+          ).textTheme.headlineMedium?.copyWith(fontWeight: FontWeight.bold),
         ),
         elevation: 0,
-        backgroundColor: Theme.of(context).scaffoldBackgroundColor.withOpacity(0.9),
+        backgroundColor: Theme.of(
+          context,
+        ).scaffoldBackgroundColor.withOpacity(0.9),
+        leading: Builder(
+          builder: (context) => IconButton(
+            icon: const Icon(Icons.menu_rounded),
+            onPressed: () {
+              Scaffold.of(context).openDrawer();
+            },
+          ),
+        ),
         actions: [
           IconButton(
             icon: const Icon(Icons.search_rounded),
@@ -79,6 +114,196 @@ class _ProductsViewState extends State<ProductsView>
             },
           ),
         ],
+      ),
+      drawer: Drawer(
+        child: Column(
+          children: [
+            // Drawer Header with user info
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(20),
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: [
+                    const Color(0xFF6B5B95),
+                    const Color(0xFF6B5B95).withOpacity(0.8),
+                  ],
+                ),
+              ),
+              child: SafeArea(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const CircleAvatar(
+                      radius: 40,
+                      backgroundColor: Colors.white,
+                      child: Icon(
+                        Icons.person,
+                        size: 45,
+                        color: Color(0xFF6B5B95),
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    Text(
+                      _userName,
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 22,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      _userEmail,
+                      style: TextStyle(
+                        color: Colors.white.withOpacity(0.9),
+                        fontSize: 14,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            // Drawer items
+            Expanded(
+              child: ListView(
+                padding: EdgeInsets.zero,
+                children: [
+                  ListTile(
+                    leading: const Icon(
+                      Icons.person_outline,
+                      color: Color(0xFF6B5B95),
+                    ),
+                    title: const Text('My Profile'),
+                    onTap: () {
+                      Navigator.pop(context);
+                      // Navigate to profile page (you can create this later)
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('Profile page coming soon!'),
+                        ),
+                      );
+                    },
+                  ),
+                  ListTile(
+                    leading: const Icon(
+                      Icons.favorite_outline,
+                      color: Color(0xFF6B5B95),
+                    ),
+                    title: const Text('Favorites'),
+                    onTap: () {
+                      Navigator.pop(context);
+                      // Navigate to favorites page
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('Favorites page coming soon!'),
+                        ),
+                      );
+                    },
+                  ),
+                  ListTile(
+                    leading: const Icon(
+                      Icons.history,
+                      color: Color(0xFF6B5B95),
+                    ),
+                    title: const Text('Watch History'),
+                    onTap: () {
+                      Navigator.pop(context);
+                      // Navigate to history page
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('History page coming soon!'),
+                        ),
+                      );
+                    },
+                  ),
+                  const Divider(),
+                  ListTile(
+                    leading: const Icon(
+                      Icons.settings_outlined,
+                      color: Color(0xFF6B5B95),
+                    ),
+                    title: const Text('Settings'),
+                    onTap: () {
+                      Navigator.pop(context);
+                      // Navigate to settings page
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('Settings page coming soon!'),
+                        ),
+                      );
+                    },
+                  ),
+                  ListTile(
+                    leading: const Icon(
+                      Icons.info_outline,
+                      color: Color(0xFF6B5B95),
+                    ),
+                    title: const Text('About'),
+                    onTap: () {
+                      Navigator.pop(context);
+                      showDialog(
+                        context: context,
+                        builder: (context) => AlertDialog(
+                          title: const Text('About Anime Movies'),
+                          content: const Text(
+                            'Anime Movies App\nVersion 1.0.0\n\nDiscover the best anime movies in one place.',
+                          ),
+                          actions: [
+                            TextButton(
+                              onPressed: () => Navigator.pop(context),
+                              child: const Text('Close'),
+                            ),
+                          ],
+                        ),
+                      );
+                    },
+                  ),
+                ],
+              ),
+            ),
+            // Logout button at bottom
+            const Divider(height: 1),
+            ListTile(
+              leading: const Icon(Icons.logout, color: Colors.red),
+              title: const Text(
+                'Logout',
+                style: TextStyle(
+                  color: Colors.red,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+              onTap: () {
+                showDialog(
+                  context: context,
+                  builder: (context) => AlertDialog(
+                    title: const Text('Logout'),
+                    content: const Text('Are you sure you want to logout?'),
+                    actions: [
+                      TextButton(
+                        onPressed: () => Navigator.pop(context),
+                        child: const Text('Cancel'),
+                      ),
+                      TextButton(
+                        onPressed: () {
+                          Navigator.pop(context);
+                          _logout();
+                        },
+                        style: TextButton.styleFrom(
+                          foregroundColor: Colors.red,
+                        ),
+                        child: const Text('Logout'),
+                      ),
+                    ],
+                  ),
+                );
+              },
+            ),
+            const SizedBox(height: 8),
+          ],
+        ),
       ),
       body: Container(
         decoration: BoxDecoration(
@@ -113,8 +338,9 @@ class _ProductsViewState extends State<ProductsView>
                             _selectedFilter = _filters[index];
                           });
                         },
-                        selectedColor:
-                            Theme.of(context).colorScheme.primary.withOpacity(0.2),
+                        selectedColor: Theme.of(
+                          context,
+                        ).colorScheme.primary.withOpacity(0.2),
                         checkmarkColor: Theme.of(context).colorScheme.primary,
                       ),
                     );
@@ -206,12 +432,13 @@ class _ProductsViewState extends State<ProductsView>
                       },
                       child: GridView.builder(
                         padding: const EdgeInsets.all(16),
-                        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: 2,
-                          crossAxisSpacing: 16,
-                          mainAxisSpacing: 16,
-                          childAspectRatio: 0.65,
-                        ),
+                        gridDelegate:
+                            const SliverGridDelegateWithFixedCrossAxisCount(
+                              crossAxisCount: 2,
+                              crossAxisSpacing: 16,
+                              mainAxisSpacing: 16,
+                              childAspectRatio: 0.65,
+                            ),
                         itemCount: products.length,
                         itemBuilder: (context, index) {
                           final product = products[index];
@@ -221,7 +448,8 @@ class _ProductsViewState extends State<ProductsView>
                               return FadeTransition(
                                 opacity: _animationController,
                                 child: Transform.scale(
-                                  scale: 0.9 + (_animationController.value * 0.1),
+                                  scale:
+                                      0.9 + (_animationController.value * 0.1),
                                   child: _buildMovieCard(context, product),
                                 ),
                               );
@@ -242,14 +470,12 @@ class _ProductsViewState extends State<ProductsView>
 
   Widget _buildMovieCard(BuildContext context, Map<String, dynamic> product) {
     final rating = product['score']?.toString() ?? 'N/A';
-    
+
     return GestureDetector(
       onTap: () {
         Navigator.push(
           context,
-          MaterialPageRoute(
-            builder: (_) => ProductView(product: product),
-          ),
+          MaterialPageRoute(builder: (_) => ProductView(product: product)),
         );
       },
       child: Card(
@@ -275,15 +501,15 @@ class _ProductsViewState extends State<ProductsView>
                         loadingBuilder: (context, child, loadingProgress) {
                           if (loadingProgress == null) return child;
                           return Container(
-                            color: Theme.of(context)
-                                .colorScheme
-                                .primary
-                                .withOpacity(0.1),
+                            color: Theme.of(
+                              context,
+                            ).colorScheme.primary.withOpacity(0.1),
                             child: Center(
                               child: CircularProgressIndicator(
-                                value: loadingProgress.expectedTotalBytes != null
+                                value:
+                                    loadingProgress.expectedTotalBytes != null
                                     ? loadingProgress.cumulativeBytesLoaded /
-                                        loadingProgress.expectedTotalBytes!
+                                          loadingProgress.expectedTotalBytes!
                                     : null,
                               ),
                             ),
@@ -291,10 +517,9 @@ class _ProductsViewState extends State<ProductsView>
                         },
                         errorBuilder: (context, error, stackTrace) {
                           return Container(
-                            color: Theme.of(context)
-                                .colorScheme
-                                .error
-                                .withOpacity(0.1),
+                            color: Theme.of(
+                              context,
+                            ).colorScheme.error.withOpacity(0.1),
                             child: Icon(
                               Icons.broken_image,
                               color: Theme.of(context).colorScheme.error,
@@ -353,20 +578,19 @@ class _ProductsViewState extends State<ProductsView>
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                     style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                          fontWeight: FontWeight.bold,
-                          height: 1.2,
-                        ),
+                      fontWeight: FontWeight.bold,
+                      height: 1.2,
+                    ),
                   ),
                   const SizedBox(height: 4),
                   if (product['year'] != null)
                     Text(
                       "${product['year']}",
                       style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                            color: Theme.of(context)
-                                .colorScheme
-                                .onSurface
-                                .withOpacity(0.6),
-                          ),
+                        color: Theme.of(
+                          context,
+                        ).colorScheme.onSurface.withOpacity(0.6),
+                      ),
                     ),
                 ],
               ),
@@ -377,344 +601,3 @@ class _ProductsViewState extends State<ProductsView>
     );
   }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-/*
-
-//المشروع الاصلي
-
-
-import 'dart:convert';
-import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
-
-import 'product_view.dart';
-
-class ProductsView extends StatefulWidget {
-  const ProductsView({Key? key}) : super(key: key);
-
-  @override
-  State<ProductsView> createState() => _ProductsViewState();
-}
-
-class _ProductsViewState extends State<ProductsView> {
-  late Future<List<dynamic>> _productsFuture;
-
-  @override
-  void initState() {
-    super.initState();
-    _productsFuture = fetchProducts();
-  }
-
-  Future<List<dynamic>> fetchProducts() async {
-    final response = await http.get(
-      Uri.parse('https://api.jikan.moe/v4/anime?type=movie'),
-    );
-
-    if (response.statusCode == 200) {
-      final data = jsonDecode(response.body);
-      return data["data"]; // ✅ استخدم "data" مش "products"
-    } else {
-      throw Exception("Failed to load products");
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text("Anime Movies")),
-      body: FutureBuilder<List<dynamic>>(
-        future: _productsFuture,
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
-          } else if (snapshot.hasError) {
-            return Center(child: Text("Error: ${snapshot.error}"));
-          } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-            return const Center(child: Text("No movies found"));
-          }
-
-          final products = snapshot.data!;
-
-          return GridView.builder(
-            padding: const EdgeInsets.all(8),
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 2, // 2 أفلام في الصف
-              crossAxisSpacing: 10,
-              mainAxisSpacing: 10,
-              childAspectRatio: 0.65,
-            ),
-            itemCount: products.length,
-            itemBuilder: (context, index) {
-              final product = products[index];
-              return GestureDetector(
-                onTap: () {
-                  debugPrint("Clicked: ${product['title']}");
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) => ProductView(product: product),
-                    ),
-                  );
-                },
-                child: Card(
-                  elevation: 3,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      Expanded(
-                        child: ClipRRect(
-                          borderRadius: const BorderRadius.vertical(
-                            top: Radius.circular(12),
-                          ),
-                          child: Image.network(
-                            product['images']['jpg']['image_url'], // ✅ الصورة
-                            fit: BoxFit.cover,
-                          ),
-                        ),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.all(8),
-                        child: Text(
-                          product['title'], // ✅ العنوان
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
-                          style: const TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 14,
-                          ),
-                        ),
-                      ),
-                      if (product['year'] != null) // ✅ عرض السنة لو موجودة
-                        Padding(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 8,
-                            vertical: 4,
-                          ),
-                          child: Text(
-                            "Year: ${product['year']}",
-                            style: const TextStyle(
-                              color: Colors.grey,
-                              fontSize: 12,
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                        ),
-                    ],
-                  ),
-                ),
-              );
-            },
-          );
-        },
-      ),
-    );
-  }
-}
-
-*/
- 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-/*
-import 'dart:convert';
-import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
-
-import 'product_view.dart';
-
-class ProductsView extends StatefulWidget {
-  const ProductsView({Key? key}) : super(key: key);
-
-  @override
-  State<ProductsView> createState() => _ProductsViewState();
-}
-
-class _ProductsViewState extends State<ProductsView> {
-  late Future<List<dynamic>> _productsFuture;
-
-  @override
-  void initState() {
-    super.initState();
-    _productsFuture = fetchProducts();
-  }
-
-  Future<List<dynamic>> fetchProducts() async {
-    final response = await http.get(
-      Uri.parse('https://api.jikan.moe/v4/anime?type=movie'),//https://dummyjson.com/products
-    );
-
-    if (response.statusCode == 200) {
-      final data = jsonDecode(response.body);
-      return data["products"]; // ✅ رجّع القائمة فقط
-    } else {
-      throw Exception("Failed to load products");
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text("Products")),
-      body: FutureBuilder<List<dynamic>>(
-        future: _productsFuture,
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
-          } else if (snapshot.hasError) {
-            return Center(child: Text("Error: ${snapshot.error}"));
-          } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-            return const Center(child: Text("No products found"));
-          }
-
-          final products = snapshot.data!;
-
-          return GridView.builder(
-            padding: const EdgeInsets.all(8),
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 2, // 2 products per row
-              crossAxisSpacing: 10,
-              mainAxisSpacing: 10,
-              childAspectRatio: 0.7,
-            ),
-            itemCount: products.length,
-            itemBuilder: (context, index) {
-              final product = products[index];
-              return GestureDetector(
-                onTap: () {
-                  debugPrint("Clicked: ${product['title']}");
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) => ProductView(product: product),
-                    ),
-                  );
-                },
-                child: Card(
-                  elevation: 3,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      Expanded(
-                        child: ClipRRect(
-                          borderRadius: const BorderRadius.vertical(
-                            top: Radius.circular(12),
-                          ),
-                          child: Image.network(
-                            product['thumbnail'], // ✅ استخدم thumbnail
-                            fit: BoxFit.contain,
-                          ),
-                        ),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.all(8),
-                        child: Text(
-                          product['title'],
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
-                          style: const TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 14,
-                          ),
-                        ),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 8,
-                          vertical: 4,
-                        ),
-                        child: Text(
-                          "\$${product['price']}",
-                          style: const TextStyle(
-                            color: Colors.green,
-                            fontSize: 14,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              );
-            },
-          );
-        },
-      ),
-    );
-  }
-}
-*/
