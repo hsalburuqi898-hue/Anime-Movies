@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'signup_screen.dart';
 import '../task/products_view.dart';
 
@@ -15,6 +16,13 @@ class _LoginScreenState extends State<LoginScreen> {
   final _passwordController = TextEditingController();
   bool _obscurePassword = true;
   bool _rememberMe = false;
+
+  @override
+  void dispose() {
+    _emailController.dispose();
+    _passwordController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -151,6 +159,13 @@ class _LoginScreenState extends State<LoginScreen> {
                     GestureDetector(
                       onTap: () {
                         // Handle forgot password
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text(
+                              'Forgot password feature coming soon!',
+                            ),
+                          ),
+                        );
                       },
                       child: const Text(
                         'Forgot Password?',
@@ -166,15 +181,26 @@ class _LoginScreenState extends State<LoginScreen> {
 
                 // Login Button
                 ElevatedButton(
-                  onPressed: () {
+                  onPressed: () async {
                     if (_formKey.currentState!.validate()) {
+                      // For login, we'll use the email as username if no username exists
+                      final prefs = await SharedPreferences.getInstance();
+
+                      // Extract username from email (part before @)
+                      String username = _emailController.text.split('@')[0];
+
+                      await prefs.setString('username', username);
+                      await prefs.setString('email', _emailController.text);
+
                       // Navigate to ProductsView
-                      Navigator.pushReplacement(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const ProductsView(),
-                        ),
-                      );
+                      if (mounted) {
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const ProductsView(),
+                          ),
+                        );
+                      }
                     }
                   },
                   style: ElevatedButton.styleFrom(
@@ -218,28 +244,40 @@ class _LoginScreenState extends State<LoginScreen> {
                     _SocialButton(
                       icon: Icons.g_mobiledata,
                       label: 'Google',
-                      onPressed: () {
-                        // Handle Google login
-                        Navigator.pushReplacement(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => const ProductsView(),
-                          ),
-                        );
+                      onPressed: () async {
+                        // Save default data for Google login
+                        final prefs = await SharedPreferences.getInstance();
+                        await prefs.setString('username', 'Google User');
+                        await prefs.setString('email', 'googleuser@gmail.com');
+
+                        if (mounted) {
+                          Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const ProductsView(),
+                            ),
+                          );
+                        }
                       },
                     ),
                     const SizedBox(width: 16),
                     _SocialButton(
                       icon: Icons.facebook,
                       label: 'Facebook',
-                      onPressed: () {
-                        // Handle Facebook login
-                        Navigator.pushReplacement(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => const ProductsView(),
-                          ),
-                        );
+                      onPressed: () async {
+                        // Save default data for Facebook login
+                        final prefs = await SharedPreferences.getInstance();
+                        await prefs.setString('username', 'Facebook User');
+                        await prefs.setString('email', 'fbuser@facebook.com');
+
+                        if (mounted) {
+                          Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const ProductsView(),
+                            ),
+                          );
+                        }
                       },
                     ),
                   ],

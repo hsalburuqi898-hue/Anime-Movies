@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'login_screen.dart';
 import '../task/products_view.dart';
 
@@ -17,6 +18,15 @@ class _SignUpScreenState extends State<SignUpScreen> {
   final _confirmPasswordController = TextEditingController();
   bool _obscurePassword = true;
   bool _obscureConfirmPassword = true;
+
+  @override
+  void dispose() {
+    _usernameController.dispose();
+    _emailController.dispose();
+    _passwordController.dispose();
+    _confirmPasswordController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -220,15 +230,25 @@ class _SignUpScreenState extends State<SignUpScreen> {
 
                 // Sign Up Button
                 ElevatedButton(
-                  onPressed: () {
+                  onPressed: () async {
                     if (_formKey.currentState!.validate()) {
-                      // Navigate to ProductsView
-                      Navigator.pushReplacement(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const ProductsView(),
-                        ),
+                      // Save user data to SharedPreferences
+                      final prefs = await SharedPreferences.getInstance();
+                      await prefs.setString(
+                        'username',
+                        _usernameController.text,
                       );
+                      await prefs.setString('email', _emailController.text);
+
+                      // Navigate to ProductsView
+                      if (mounted) {
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const ProductsView(),
+                          ),
+                        );
+                      }
                     }
                   },
                   style: ElevatedButton.styleFrom(
@@ -272,28 +292,40 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     _SocialButton(
                       icon: Icons.g_mobiledata,
                       label: 'Google',
-                      onPressed: () {
-                        // Handle Google sign up
-                        Navigator.pushReplacement(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => const ProductsView(),
-                          ),
-                        );
+                      onPressed: () async {
+                        // Save default data for Google sign up
+                        final prefs = await SharedPreferences.getInstance();
+                        await prefs.setString('username', 'Google User');
+                        await prefs.setString('email', 'googleuser@gmail.com');
+
+                        if (mounted) {
+                          Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const ProductsView(),
+                            ),
+                          );
+                        }
                       },
                     ),
                     const SizedBox(width: 16),
                     _SocialButton(
                       icon: Icons.facebook,
                       label: 'Facebook',
-                      onPressed: () {
-                        // Handle Facebook sign up
-                        Navigator.pushReplacement(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => const ProductsView(),
-                          ),
-                        );
+                      onPressed: () async {
+                        // Save default data for Facebook sign up
+                        final prefs = await SharedPreferences.getInstance();
+                        await prefs.setString('username', 'Facebook User');
+                        await prefs.setString('email', 'fbuser@facebook.com');
+
+                        if (mounted) {
+                          Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const ProductsView(),
+                            ),
+                          );
+                        }
                       },
                     ),
                   ],
